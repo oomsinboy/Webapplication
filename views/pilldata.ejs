@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./patiat/header.ejs') %>
+    <script>
+        var deletedata
+        $(document).ready(function () {       
+            $('.btnDelete').click(function () {
+                
+                let deletePost = confirm('ยืนยันการลบข้อมูล');
+                if(deletePost) {
+                    deletedata = $(this).attr('blogID')
+                    det()                  
+                    console.log('ลบข้อมูลสำเร็จ')
+                }else{
+                    console.log('ไม่ได้ลบข้อมูล')                   
+                }
+            })
+            function det() {
+                data = { idus: deletedata }
+                $.ajax({
+                    type: 'POST',
+                    url: '/delete2/' + deletedata,
+                    success: function (respone) {
+                        window.location.replace(respone)
+                    }, error: function (xhr) {
+                        alert(xhr)
+                    }
+
+                })
+            }
+
+            $('.btnEdit').click(function () {
+                //deletedata=$(this ).attr('blogID')          
+                //det()
+
+                const editfield = JSON.parse($(this).attr('blogData'))
+                document.getElementById("Editphoto").files[0] = editfield.image
+                $('#EditnameE').val(editfield.nameE)
+                $('#EditnameT').val(editfield.nameT)
+                $('#Editsize').val(editfield.tablet)
+                $('#Editunit').val(editfield.unit)
+                $('#Editdes').val(editfield.descrip)
+                $('#Editeat').val(editfield.size)
+                $('#EditSE').val(editfield.SE)
+                $('#Editcau').val(editfield.cautions)
+                $('#Editpro').val(editfield.prohibition)
+                $('#Editmore').val(editfield.more)
+                $('#myModal').modal()
+                console.log(editfield)
+                deletedata = editfield.uid
+
+            })
+
+            $('#saveedit').click(function () {
+
+
+                var storage = firebase.storage();
+                var file = document.getElementById("Editphoto").files[0];
+                var storageref = storage.ref();
+                var thisref = storageref.child('/Med_pill').child(file.name).put(file);
+                thisref.on('state_changed', function (snapshot) {
+
+
+                }, function (error) {
+
+                }, function () {
+                    // Uploaded completed successfully, now we can get the download URL
+                    thisref.snapshot.ref.getDownloadURL().then(function (downloadURL) {
+                        //getting url of image
+                        //alert(downloadURL);
+                        const savephoto = downloadURL
+                        const savenameE = $('#EditnameE').val()
+                        const savenameT = $('#EditnameT').val()
+                        const savesize = $('#Editsize').val()
+                        const saveunit = $('#Editunit').val()
+                        const savedes = $('#Editdes').val()
+                        const saveeat = $('#Editeat').val()
+                        const saveSE = $('#EditSE').val()
+                        const savecau = $('#Editcau').val()
+                        const savepro = $('#Editpro').val()
+                        const savemore = $('#Editmore').val()
+
+                        $.ajax({
+                            type: 'PUT',
+                            url: '/edit2/' + deletedata,
+                            data: {
+                                'saveupnameE': savenameE, 'saveupnameT': savenameT, 'susize': savesize, 'saveupphoto': savephoto,
+                                'suunit': saveunit, 'sudes': savedes, 'sueat': saveeat, 'suSE': saveSE, 'sucau': savecau,
+                                'supro': savepro, 'sumore': savemore
+                            }
+                        }).done(function (data, state, xhr) {
+                            window.location.replace(data)
+                        })
+
+
+                        //saveMessage(downloadURL);
+                    });
+                });
+
+            })
+
+
+            $('#add').click(function () {
+                $('#myModaladd').modal()
+
+            })
+
+
+            $('#saveadd').click(function () {
+
+                uploadimage()
+
+
+
+
+            })
+
+            var firebaseConfig = {
+                apiKey: "AIzaSyAbpMLfyvgIXqqBsqpS6flPbxNjM1E4AR8",
+                authDomain: "projectapp-e95c9.firebaseapp.com",
+                databaseURL: "https://projectapp-e95c9-default-rtdb.asia-southeast1.firebasedatabase.app",
+                projectId: "projectapp-e95c9",
+                storageBucket: "projectapp-e95c9.appspot.com",
+                messagingSenderId: "780126206014",
+                appId: "1:780126206014:web:9030c6826f264c9688b96f",
+                measurementId: "G-L283ZTS61C"
+            };
+            firebase.initializeApp(firebaseConfig);
+            var messagesRef = firebase.database().ref('medpill');
+
+            function uploadimage() {
+                var storage = firebase.storage();
+                var file = document.getElementById("addphoto").files[0];
+                var storageref = storage.ref();
+                var thisref = storageref.child('/Med_pill').child(file.name).put(file);
+                thisref.on('state_changed', function (snapshot) {
+
+
+                }, function (error) {
+
+                }, function () {
+                    // Uploaded completed successfully, now we can get the download URL
+                    thisref.snapshot.ref.getDownloadURL().then(function (downloadURL) {
+                        //getting url of image
+                        //alert(downloadURL);
+                        const savephoto = downloadURL
+                        const savenameE = $('#addnameE').val()
+                        const savenameT = $('#addnameT').val()
+                        const savesize = $('#addsize').val()
+                        const saveunit = $('#addunit').val()
+                        const savedes = $('#adddes').val()
+                        const saveeat = $('#addeat').val()
+                        const saveSE = $('#addSE').val()
+                        const savecau = $('#addcau').val()
+                        const savepro = $('#addpro').val()
+                        const savemore = $('#addmore').val()
+
+                        $.ajax({
+                            type: 'POST',
+                            url: '/add2',
+
+
+                            data: {
+                                'saveupphoto': savephoto, 'saveupnameE': savenameE, 'saveupnameT': savenameT, 'susize': savesize,
+                                'suunit': saveunit, 'sudes': savedes, 'sueat': saveeat, 'suSE': saveSE, 'sucau': savecau,
+                                'supro': savepro, 'sumore': savemore
+                            }
+
+                            //data: savephoto
+                        }).done(function (data, state, xhr) {
+                            window.location.reload()
+                        })
+
+
+                        //saveMessage(downloadURL);
+                    });
+                });
+
+            }
+
+        }
+        )
+    </script>
+
+    <body>
+
+        <%- include('./patiat/napbar.ejs') %>
+            <div class=" mt-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h1>
+                            <tr>
+                                <td>ข้อมูลยาในระบบ</td>
+                            </tr>
+                            <button type="button" class="btn btn-primary float-right" id="add">เพิ่มข้อมูล</button>
+                        </h1>
+                    </div>
+                </div class=''>
+                <table class="table table-bordered table-striped mt">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>ชื่อยาสามัญ อังกฤษ</th>
+                            <th>รูปยา</th>
+                            <th>ชื่อยาสามัญ </th>
+                            <th>ขนาดยา</th>
+                            <th>หน่วยของยา</th>
+                            <th>ข้อบ่งใช้</th>
+                            <th>ขนาดรับประทาน</th>
+                            <th>ผลข้างเคียง</th>
+                            <th>ข้อควรระวัง</th>
+                            <th>ข้อห้ามใช้</th>
+                            <th>แนะนำเพิ่มเติม</th>
+                            <th>Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="myTable">
+                        <% for( let index=0; index < result.length; index++ ) { %>
+                            <tr>
+                                <td>
+                                    <%= result[index].nameE %>
+                                </td>
+                                <td>
+                                    <img src='<%= result[index].image %>'>
+                                </td>
+                                
+                                <td>
+                                    <%= result[index].nameT %>
+                                </td>
+                                <td>
+                                    <%= result[index].tablet %>
+                                </td>
+                                <td>
+                                    <%= result[index].unit %>
+                                </td>
+                                <td>
+                                    <%= result[index].descrip %>
+                                </td>
+                                <td>
+                                    <%= result[index].size %>
+                                </td>
+                                <td>
+                                    <%= result[index].SE %>
+                                        <%= result[index].se1 %>
+                                            <%= result[index].se2 %>
+                                                <%= result[index].se3 %>
+                                                    <%= result[index].se4 %>
+                                                        <%= result[index].se5 %>
+                                                            <%= result[index].se6 %>
+                                                                <%= result[index].se7 %>
+                                                                    <%= result[index].se8 %>
+
+                                </td>
+                                <td>
+                                    <%= result[index].cautions %>
+                                        <%= result[index].caut1 %>
+                                            <%= result[index].caut2 %>
+                                                <%= result[index].caut3 %>
+                                                    <%= result[index].caut4 %>
+                                                        <%= result[index].caut5 %>
+                                                            <%= result[index].caut6 %>
+                                                                <%= result[index].caut7 %>
+
+                                </td>
+                                <td>
+                                    <%= result[index].prohibition %>
+                                        <%= result[index].proh1 %>
+                                            <%= result[index].proh2 %>
+                                                <%= result[index].proh3 %>
+                                </td>
+
+                                <td>
+                                    <%= result[index].more %>
+                                        <%= result[index].more1 %>
+                                            <%= result[index].more2 %>
+                                </td>
+                                <td> <button type="button" class="btn btn-warning btnEdit"
+                                        blogData="<%= JSON.stringify(result[index]) %>">Edit</button>
+                                    <button type="button" class="btn btn-danger btnDelete"
+                                        blogID="<%= result[index].uid %>">Delete</button>
+
+                                </td>
+                            </tr>
+                            <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">แก้ไขข้อมูล</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <label for="exampleInputEmail1">รูปยา</label>
+                            <input type="file" name="files[]" class="form-control" id="Editphoto"
+                                aria-describedby="emailHelp">
+                            <label for="exampleInputEmail1">ชื่อยาสามัญ อังกฤษ</label>
+                            <input class="form-control" id="EditnameE" aria-describedby="emailHelp">
+                            <label for="exampleInputEmail1">ชื่อยาสามัญ</label>
+                            <input class="form-control" id="EditnameT" aria-describedby="emailHelp">
+                            <label for="exampleInputEmail1">ขนาดยา</label>
+                            <input class="form-control" id="Editsize" aria-describedby="emailHelp">
+                            <label for="exampleInputEmail1">หน่วยของยา</label>
+                            <input class="form-control" id="Editunit" aria-describedby="emailHelp">
+                            <label for="exampleInputEmail1">ข้อบ่งใช้</label>
+                            <!-- <input class="form-control" id="Editdes" aria-describedby="emailHelp"> -->
+                            <textarea class="form-control" id="Editdes"></textarea>
+                            <label for="exampleInputEmail1">ขนาดรับประทาน</label>
+                            <!-- <input class="form-control" id="Editeat" aria-describedby="emailHelp"> -->
+                            <textarea class="form-control" id="Editeat"></textarea>
+                            <label for="exampleInputEmail1">ผลข้างเคียง</label>
+                            <!-- <input class="form-control" id="EditSE" aria-describedby="emailHelp"> -->
+                            <textarea class="form-control" id="EditSE"></textarea>
+                            <label for="exampleInputEmail1">ข้อควรระวัง</label>
+                            <!-- <input class="form-control" id="Editcau" aria-describedby="emailHelp"> -->
+                            <textarea class="form-control" id="Editcau"></textarea>
+                            <label for="exampleInputEmail1">ข้อห้ามใช้</label>
+                            <!-- <input class="form-control" id="Editpro" aria-describedby="emailHelp"> -->
+                            <textarea class="form-control" id="Editpro"></textarea>
+                            <label for="exampleInputEmail1">แนะนำเพิ่มเติม</label>
+                            <!-- <input class="form-control" id="Editmore" aria-describedby="emailHelp"> -->
+                            <textarea class="form-control" id="Editmore"></textarea>
+                        </div>
+
+                        <div class="modal-footer">
+
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="saveedit">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="myModaladd" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">เพิ่มข้อมูลยา</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+
+                            <label for="exampleInputEmail1">รูปยา</label>
+                            <input type="file" name="files[]" class="form-control" id="addphoto"
+                                aria-describedby="emailHelp">
+                            <label for="exampleInputEmail1">ชื่อยาสามัญ อังกฤษ</label>
+                            <input class="form-control" id="addnameE" aria-describedby="emailHelp">
+                            <label for="exampleInputEmail1">ชื่อยาสามัญ</label>
+                            <input class="form-control" id="addnameT" aria-describedby="emailHelp">
+                            <label for="exampleInputEmail1">ขนาดยา</label>
+                            <input class="form-control" id="addsize" aria-describedby="emailHelp">
+                            <label for="exampleInputEmail1">หน่วยของยา</label>
+                            <input class="form-control" id="addunit" aria-describedby="emailHelp">
+                            <label for="exampleInputEmail1">ข้อบ่งใช้</label>
+                            <!-- <input class="form-control" id="Editdes" aria-describedby="emailHelp"> -->
+                            <textarea class="form-control" id="adddes"></textarea>
+                            <label for="exampleInputEmail1">ขนาดรับประทาน</label>
+                            <!-- <input class="form-control" id="Editeat" aria-describedby="emailHelp"> -->
+                            <textarea class="form-control" id="addeat"></textarea>
+                            <label for="exampleInputEmail1">ผลข้างเคียง</label>
+                            <!-- <input class="form-control" id="EditSE" aria-describedby="emailHelp"> -->
+                            <textarea class="form-control" id="addSE"></textarea>
+                            <label for="exampleInputEmail1">ข้อควรระวัง</label>
+                            <!-- <input class="form-control" id="Editcau" aria-describedby="emailHelp"> -->
+                            <textarea class="form-control" id="addcau"></textarea>
+                            <label for="exampleInputEmail1">ข้อห้ามใช้</label>
+                            <!-- <input class="form-control" id="Editpro" aria-describedby="emailHelp"> -->
+                            <textarea class="form-control" id="addpro"></textarea>
+                            <label for="exampleInputEmail1">แนะนำเพิ่มเติม</label>
+                            <!-- <input class="form-control" id="Editmore" aria-describedby="emailHelp"> -->
+                            <textarea class="form-control" id="addmore"></textarea>
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary" id="saveadd">Save changes</button>
+
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+    </body>
+
+</html>

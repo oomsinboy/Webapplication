@@ -1,0 +1,51 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <a class="navbar-brand" href="#">ยินดีต้อนรับเข้าสู่ระบบแอดมิน</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+        <div class="">
+        <ul class="navbar-nav">
+            <li class="nav-item active">
+                <a class="nav-link" href="/home"> Home <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/pill"> Pill <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/addpill"> Add Pill <span class="sr-only">(current)</span></a>
+            </li>
+            <li class="nav-item active">
+                <a class="nav-link" href="/pressure"> Pressure <span class="sr-only">(current)</span></a>
+            </li>
+            <form class="form-inline">
+                <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search" id="myInput" onkeyup="seachFun()">
+
+              </form>
+        </ul> 
+        </div>
+        <script>
+            const seachFun = () =>{ 
+                let filter = document.getElementById('myInput').value.toUpperCase();
+                let myTable = document.getElementById('myTable');
+                let tr = myTable.getElementsByTagName('tr');
+
+                for(var i=0; i<tr.length; i++) {
+                    let td = tr[i].getElementsByTagName('td')[0];
+
+                    if(td){
+                        let textvalue = td.textContent || td.innerHTML;
+
+                        if(textvalue.toUpperCase().indexOf(filter) > -1){
+                            tr[i].style.display="";
+                        }else {
+                            tr[i].style.display="none";
+                        }
+                    }
+                }
+            }
+        </script>
+    </div>
+    <li class="form-inline my-2 my-lg-0"><form  action="/logout" method="post"><input type="submit" value="ออกจากระบบ" ></form></li>
+</nav>

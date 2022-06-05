@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./patiat/header.ejs') %>
+    <script>
+        var deletedata
+        var email
+        $(document).ready(function () {
+            $('.btnDelete').click(function () {
+
+                $('#EditName').val('')
+                $('#EditEmail').val('')
+                $('#EditNumberHN').val('')
+                $('#Editpassword').val('')
+                $('#myModal').modal()
+                const editfield = JSON.parse($(this).attr('blogData'))
+                console.log(editfield.email)
+                email = editfield.email
+
+            })
+
+            $('.btnEdit').click(function () {
+                //deletedata=$(this ).attr('blogID')          
+                //det()
+                const editfield = JSON.parse($(this).attr('blogData'))
+                console.log(editfield.email)
+                email = editfield.email
+                sessionStorage.setItem('email',email)
+                window.location.href = "/add_pressure_users/" + email
+
+
+            })
+
+            $('#saveedit').click(function () {
+                // const savepressuredate = $('#Addpressuredate').val()
+                const savepressureon = $('#Addpressureon').val()
+                const savepressurelower = $('#Addpressurelower').val()
+                const savepressurerate = $('#Addpressurerate').val()
+                if (savepressureon != '' && savepressurelower != '' && savepressurerate != '') {
+                    $.ajax({
+                        type: 'POST',
+                        url: '/addpressure',
+                        data: {
+                             'savepressureon': savepressureon, 'savepressurelower': savepressurelower, 'savepressurerate': savepressurerate
+                            , 'email': email
+                        }
+                    }).done(function (data, state, xhr) {
+                        window.location.replace(data)
+                    })
+                }else{
+                    alert('โปรดกรอกข้อมูลในครบ')
+                }
+
+
+
+
+            })
+
+
+
+        })
+
+
+    </script>
+
+    <body>
+        <%- include('./patiat/napbar.ejs') %>
+            <div class="container mt-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h1>
+                            <tr>
+                                <td>ค่าความดันโลหิตของผู้ใช้</td>
+                            </tr>
+                        </h1>
+                    </div>
+                </div class=''>
+                <table class="table table-bordered table-striped mt">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>NumberHN</th>
+                            <th>Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="myTable">
+                        <% for( let index=0; index < result.length; index++ ) { %>
+                            <tr>
+                                <td>
+                                    <%= result[index].Name %>
+                                </td>
+                                <td>
+                                    <%= result[index].email %>
+                                </td>
+                                <td>
+                                    <%= result[index].numberHN %>
+                                </td>
+
+                                <td> <button type="button" class="btn btn-success btnDelete"
+                                        blogID="<%= result[index].uid %>"
+                                        blogData="<%= JSON.stringify(result[index]) %>">Addpill</button> <button
+                                        type="button" class="btn btn-warning btnEdit"
+                                        blogData="<%= JSON.stringify(result[index]) %>">Edit
+                                    </button>
+                                </td>
+                            </tr>
+                            <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+
+                            <h5 class="modal-title" id="exampleModalLabel">เพิ่มความดันโลหิตที่นี่</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- <label for="exampleInputEmail1">วันที่-เวลา</label>
+                            <input required type="datetime-local" class="form-control" id="Addpressuredate"
+                                placeholder="กรุณากรอกวันที่-เวลา"><br> -->
+                            <label for="exampleInputEmail1">ความดันโลหิตด้านบน(SYS)</label>
+                            <input required class="form-control" id="Addpressureon" placeholder="กรุณากรอกความดันโลหิตด้านบน"><br>
+                            <label for="exampleInputEmail1">ความดันโลหิคด้านล่าง(DIA)</label>
+                            <input required  class="form-control" id="Addpressurelower"
+                                placeholder="กรุณากรอกความดันโลหิคด้านล่าง"><br>
+                                <label for="exampleInputEmail1">อัตราการเต้นของหัวใจ(PUL)</label>
+                                <input required  class="form-control" id="Addpressurerate"
+                                    placeholder="กรุณากรอกอัตราการเต้นของหัวใจ"><br>
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="saveedit">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="myModaladd" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">เพิ่มข้อมูล</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <label for="exampleInputEmail1">Name</label>
+                            <input class="form-control" id="addName" aria-describedby="emailHelp"
+                                placeholder="กรุณากรอกชื่อ">
+                            <label for="exampleInputEmail1">Email</label>
+                            <input type="email" class="form-control" id="addEmail" aria-describedby="emailHelp"
+                                placeholder="กรุณากรอกอีเมล">
+                            <label for="exampleInputEmail1">NumberHN</label>
+                            <input type="tel" class="form-control" id="addNumberHN" aria-describedby="emailHelp"
+                                placeholder="กรุณากรอกเลขHN">
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="saveadd">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    </body>
+
+</html>

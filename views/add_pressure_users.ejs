@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./patiat/header.ejs') %>
+    <script>
+        var deletedata
+        var editfire
+        var edittest
+        $(document).ready(function () {
+            $('.btnEdit').click(function () {
+                const editfield = JSON.parse($(this).attr('blogData'))
+                console.log(editfield)
+                editfire = JSON.parse($(this).attr('blogID'))
+                edittest = JSON.parse($(this).attr('blogDetail'))
+
+                // $('#Addpressuredate').val(editfield.Adata_time)
+                $('#Addpressureon').val(editfield.data_title)
+                $('#Addpressurelower').val(editfield.data_description)
+                $('#Addpressurerate').val(editfield.data_heartrate)
+                $('#myModal').modal()
+                //console.log(editfield)
+                deletedata = editfield.uid
+
+            })
+
+            $('.btnDelete').click(function () {
+                //deletedata=$(this ).attr('blogID')          
+                //det()
+                const editfield = JSON.parse($(this).attr('blogData'))
+                console.log(editfield)               
+
+                const editfire = JSON.parse($(this).attr('blogID'))
+                console.log(editfire)
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/deletepressureuser',
+                    data: { 'id': editfield,'email': editfire }
+                }).done(function (data, state, xhr) {
+                    //alert(data)
+                    window.location.reload()
+                })               
+
+            })
+
+            $('#saveedit').click(function () {
+                // const savepressuredate = $('#Addpressuredate').val()
+                const savepressureon = $('#Addpressureon').val()
+                const savepressurelower = $('#Addpressurelower').val()
+                const savepressurerate = $('#Addpressurerate').val()
+                const email = editfire
+                const id = edittest
+
+                alert(id)
+
+                $.ajax({
+                    type: 'PUT',
+                    url: '/editpressureuser',
+                    data: { email: email,  'savepressureon': savepressureon, 'savepressurelower': savepressurelower, 'savepressurerate': savepressurerate, 'id': id }
+                }).done(function (data, state, xhr) {
+                    window.location.reload()
+                })
+
+            })
+
+
+
+        })
+
+
+    </script>
+
+    <body>
+        <%- include('./patiat/napbar.ejs') %>
+            <div class="container mt-5">
+                <div class="card">
+                    <div class="card-header">
+                        <h1>
+                            <tr>
+                                <td>เพิ่มความดันโลหิตของผู้ใช้</td>
+                            </tr>
+                        </h1>
+                    </div>
+                </div class=''>
+                <table class="table table-bordered table-striped mt">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>วันที่-เวลา</th>
+                            <th>ความดันโลหิคด้านบน(SYS)</th>
+                            <th>ความดันโลหิคด้านล่าง(DIA)</th>
+                            <th>อัตราการเต้นของหัวใจ(PUL)</th>
+                            <th>Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="myTable">
+                        <% for( let index=0; index < result.length; index++ ) { %>
+                            <tr>
+                                <td>
+                                    <%= result[index].Adata_time %>
+                                </td>
+                                <td>
+                                    <%= result[index].data_title %>
+                                </td>
+                                <td>
+                                    <%= result[index].data_description %>
+                                </td>
+                                <td>
+                                    <%= result[index].data_heartrate %>
+                                </td>
+
+                                <td> <button type="button" class="btn btn-warning btnEdit"
+                                        blogID="<%= JSON.stringify(email) %>"
+                                        blogData="<%= JSON.stringify(result[index]) %>"
+                                        blogDetail="<%= JSON.stringify(useid[index]) %>">Edit</button> 
+                                        <button
+                                        type="button" class="btn btn-danger btnDelete "
+                                        blogData="<%= JSON.stringify(useid[index]) %>"
+                                        blogID="<%= JSON.stringify(email) %>">Delete
+                                    </button>
+                                </td>
+                            </tr>
+                            <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">แก้ไขความดันที่นี่</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <!-- <label for="exampleInputEmail1">วันที่-เวลา</label>
+                            <input required type="datetime-local" class="form-control" id="Addpressuredate"
+                                placeholder="กรุณากรอกวันที่-เวลา"><br> -->
+                            <label for="exampleInputEmail1">ความดันโลหิตด้านบน(SYS)</label>
+                            <input required class="form-control" id="Addpressureon" placeholder="กรุณากรอกความดันโลหิตด้านบน"><br>
+                            <label for="exampleInputEmail1">ความดันโลหิคด้านล่าง(DIA)</label>
+                            <input required  class="form-control" id="Addpressurelower"
+                                placeholder="กรุณากรอกความดันโลหิคด้านล่าง"><br>
+                                <label for="exampleInputEmail1">อัตราการเต้นของหัวใจ(PUL)</label>
+                                <input required  class="form-control" id="Addpressurerate"
+                                    placeholder="กรุณากรอกอัตราการเต้นของหัวใจ"><br>
+
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="saveedit">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="myModaladd" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">เพิ่มข้อมูล</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <label for="exampleInputEmail1">Name</label>
+                            <input class="form-control" id="addName" aria-describedby="emailHelp"
+                                placeholder="กรุณากรอกชื่อ">
+                            <label for="exampleInputEmail1">Email</label>
+                            <input type="email" class="form-control" id="addEmail" aria-describedby="emailHelp"
+                                placeholder="กรุณากรอกอีเมล">
+                            <label for="exampleInputEmail1">NumberHN</label>
+                            <input type="tel" class="form-control" id="addNumberHN" aria-describedby="emailHelp"
+                                placeholder="กรุณากรอกเลขHN">
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="saveadd">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    </body>
+
+</html>

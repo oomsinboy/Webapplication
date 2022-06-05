@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./patiat/header.ejs') %>
+<link rel="stylesheet" type="text/css" href="/style/style.css">
+<script>
+
+    $(document).ready(function () {
+       
+
+        $('#login').click(function() {
+            var email = $('#email_fiel').val()
+            var password = $('#password_fiel').val()
+             $.ajax({
+            type: 'POST',
+            url: '/login',
+            data : {'loginmail': email, 'loginpass': password}
+           
+        }).done(function (data, state, xhr) {
+            // alert('success')
+            // console.log(data) 
+            if(data == "no data") {
+
+            } else {
+                sessionStorage.setItem("user", data[0].Name)
+                console.log(data[0].email)
+                window.location.replace("/home")
+            }
+            // window.location.replace(data)
+        })
+        })
+    })
+</script>
+<style>
+
+
+</style>
+
+<body>
+    <div class="center">
+        <h1>Admin Login</h1>
+        <!-- <form>       
+            <div class="txt_field">
+                <input type="text" required id="email_fiel">
+                <span></span>
+                <label>Username</label>
+            </div>
+            <div class="txt_field">
+                <input type="password" required id="password_fiel">
+                <span></span>
+                <label>Password</label>
+            </div>
+            <button type="submit" id="login" ></button>                      
+        </form> -->
+
+            <div class="imgcontainer">             
+            </div>       
+            <div class="container">
+                <div>
+              <label for="uname"><b>Username</b></label>
+              <input type="text" required id="email_fiel">
+            </div>
+             <div style="padding-left: 5px;">
+              <label for="psw"><b>Password</b></label>
+              <input type="password" required id="password_fiel" >
+            </div>
+            
+            </div>
+          
+            <div class="container" style="padding-top: 20px; text-align: center;" >
+                <button type="submit" id="login" style="width: 70%;
+                height: 50px;
+                border: 1px solid;
+                background: #2691d9;
+                border-radius: 25px;
+                font-size: 18px;
+                color: #e9f4fb;
+                font-weight: 700;
+                cursor: pointer;
+                outline: none;">Login</button>
+            </div>
+
+    </div>
+
+</body>
+
+</html>

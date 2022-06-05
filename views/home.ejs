@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./patiat/header.ejs') %>
+    <script>
+        var deletedata
+        $(document).ready(function () {
+            $('.btnDelete').click(function () {
+                
+                let deletePost = confirm('ยืนยันการลบข้อมูล');
+                if(deletePost) {
+                    deletedata = $(this).attr('blogID')
+                    det()               
+                    console.log('ลบข้อมูลสำเร็จ')
+                }else{
+                    console.log('ไม่ได้ลบข้อมูล')                   
+                }
+            })
+            function det() {
+                data = { idus: deletedata }
+                $.ajax({
+                    type: 'POST',
+                    url: '/delete1/' + deletedata,
+                    success: function (respone) {
+                        window.location.replace(respone)
+                    }, error: function (xhr) {
+                        alert(xhr)
+                    }
+                })
+            }
+            $('.btnEdit').click(function () {
+                //deletedata=$(this ).attr('blogID')          
+                //det()
+
+                const editfield = JSON.parse($(this).attr('blogData'))
+                $('#EditName').val(editfield.Name)
+                $('#EditEmail').val(editfield.email)
+                $('#EditNumberHN').val(editfield.numberHN)
+                $('#Editpassword').val(editfield.password)
+                $('#myModal').modal()
+                console.log(editfield)
+                deletedata = editfield.uid
+
+            })
+
+            $('#saveedit').click(function () {
+                const savename = $('#EditName').val()
+                const saveemail = $('#EditEmail').val()
+                const savenumberHN = $('#EditNumberHN').val()
+                const savepassword = $('#Editpassword').val()
+
+                $.ajax({
+                    type: 'PUT',
+                    url: '/edit/' + deletedata,
+                    data: { 'saveupname': savename, 'saveupemail': saveemail, 'saveuphn': savenumberHN, 'saveuppassword': savepassword }
+                }).done(function (data, state, xhr) {
+                    window.location.replace(data)
+                })
+
+            })
+
+            $('#add').click(function () {
+                $('#myModaladd').modal()
+            })
+
+            $('#saveadd').click(function () {
+                const savename = $('#addName').val()
+                const saveemail = $('#addEmail').val()
+                const savenumberHN = $('#addNumberHN').val()
+                const savepassword = $('#addpassword').val()
+
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/add',
+                    data: { 'saveupname': savename, 'saveupemail': saveemail, 'saveuphn': savenumberHN, 'saveuppassword': savepassword }
+                }).done(function (data, state, xhr) {
+                    window.location.replace(data)
+                })
+
+            })
+
+            $(".mainlogin").text(sessionStorage.getItem("user"))
+        })
+
+
+    </script>
+
+    <body>
+        <%- include('./patiat/napbar.ejs') %>
+            <div class="container mt-5">
+                <div class="card">                   
+                    <div class="container">
+                      <h4 class="mainlogin"></h4>
+                      
+                    </div>
+                  </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h1>
+                            <tr>
+                                <td>ข้อมูลผู้ใช้</td>
+                            </tr>
+                            <button type="button" class="btn btn-primary float-right" id="add">เพิ่มข้อมูล</button>
+                        </h1>
+                    </div>
+                </div class=''>
+                
+                <table class="table table-bordered table-striped mt" >
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>Name</th>
+                            <th>Latest usage status</th>
+                            <th>Email</th>
+                            <th>NumberHN</th>
+                            <th>Password</th>
+                            <th>Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody id="myTable">
+                        <% for( let index=0; index < result.length; index++ ) { %>
+                            <tr>
+                                <td>                               
+                                    <%= result[index].Name %>
+                                </td>
+                                <td>                               
+                                    <%= result[index].user_date %>
+                                </td>
+                                <td>
+                                    <%= result[index].email %>
+                                </td>
+                                <td>
+                                    <%= result[index].numberHN %>
+                                </td>
+                                <td>
+                                    <%= result[index].password %>
+                                </td>
+                                <td> <button type="button" class="btn btn-warning btnEdit "
+                                        blogData="<%= JSON.stringify(result[index]) %>">Edit
+                                    </button>
+                                    <button type="button" class="btn btn-danger btnDelete"
+                                        blogID="<%= result[index].uid %>">Delete</button>
+
+                                </td>
+                            </tr>
+                            <% } %>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">แก้ไขข้อมูล</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <label for="exampleInputEmail1">Name</label>
+                            <input class="form-control" id="EditName" aria-describedby="emailHelp"
+                                placeholder="กรุณากรอกชื่อ">
+                            <label for="exampleInputEmail1">Email</label>
+                            <input type="email" class="form-control" id="EditEmail" aria-describedby="emailHelp"
+                                placeholder="กรุณากรอกอีเมล">
+                            <label for="exampleInputEmail1">NumberHN</label>
+                            <input type="tel" class="form-control" id="EditNumberHN" aria-describedby="emailHelp"
+                                placeholder="กรุณากรอกเลขHN">
+                            <label for="exampleInputEmail1">Password</label>
+                            <input type="tel" class="form-control" id="Editpassword" aria-describedby="emailHelp"
+                                placeholder="กรุณากรอกรหัสผ่าน">
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="saveedit">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="myModaladd" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">เพิ่มข้อมูล</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <label for="exampleInputEmail1">Name</label>
+                            <input class="form-control" id="addName" aria-describedby="emailHelp"
+                                placeholder="กรุณากรอกชื่อ">
+                            <label for="exampleInputEmail1">Email</label>
+                            <input type="email" class="form-control" id="addEmail" aria-describedby="emailHelp"
+                                placeholder="กรุณากรอกอีเมล">
+                            <label for="exampleInputEmail1">NumberHN</label>
+                            <input type="tel" class="form-control" id="addNumberHN" aria-describedby="emailHelp"
+                                placeholder="กรุณากรอกเลขHN">
+                            <label for="exampleInputEmail1">Password</label>
+                            <input type="tel" class="form-control" id="addpassword" aria-describedby="emailHelp"
+                                placeholder="กรุณากรอกรหัสผ่าน">
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-primary" id="saveadd">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+    </body>
+
+</html>
